@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Funny Things</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #faf7fb;
+      color: #29202d;
+    }
+
+    header {
+      text-align: center;
+      padding: 28px 16px 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 34px;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      color: #777;
+    }
+
+    .gallery {
+      width: min(92%, 520px);
+      margin: 0 auto 40px;
+    }
+
+    .art-card {
+      background: white;
+      border-radius: 22px;
+      padding: 14px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.10);
+    }
+
+    .image-wrap {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background: #eee;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+    }
+
+    .art-image {
+      width: 100%;
+      display: block;
+      transition:
+        opacity .65s ease,
+        filter .65s ease,
+        transform .65s ease;
+    }
+
+    /* Pencil-reveal feeling during the switch */
+    .drawing-effect {
+      filter: grayscale(1) contrast(1.45) brightness(1.08);
+      transform: scale(1.015);
+    }
+
+    .hint {
+      text-align: center;
+      margin: 12px 0 2px;
+      color: #777;
+      font-size: 14px;
+    }
+
+    .label {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    .song {
+      margin-top: 18px;
+    }
+
+    audio {
+      width: 100%;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin: 18px 0;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 11px 16px;
+      background: #f0e8f2;
+      color: #29202d;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    #likeBtn.liked {
+      background: #ffdce6;
+    }
+
+    .comments {
+      margin-top: 20px;
+      border-top: 1px solid #eee;
+      padding-top: 18px;
+    }
+
+    .comments h2 {
+      font-size: 19px;
+      margin: 0 0 10px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 90px;
+      resize: vertical;
+      border: 1px solid #ddd;
+      border-radius: 14px;
+      padding: 12px;
+      font: inherit;
+      outline: none;
+    }
+
+    .comment-note {
+      font-size: 12px;
+      color: #777;
+      margin-top: 8px;
+    }
+
+    footer {
+      text-align: center;
+      color: #888;
+      font-size: 13px;
+      padding: 0 20px 30px;
+    }
+
+    .floating-heart {
+      position: fixed;
+      pointer-events: none;
+      font-size: 28px;
+      animation: floatUp 1s ease-out forwards;
+      z-index: 20;
+    }
+
+    @keyframes floatUp {
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to { opacity: 0; transform: translateY(-100px) scale(1.5); }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>🎨 My Funny Things</h1>
+    <div class="subtitle">Reference → My Drawing</div>
+  </header>
+
+  <main class="gallery">
+    <section class="art-card">
+
+      <div class="image-wrap" id="imageWrap" title="Double tap / double click">
+        <img
+          id="artImage"
+          class="art-image"
+          src="reference.jpg"
+          alt="Reference image"
+        >
+      </div>
+
+      <div class="label" id="imageLabel">🖼️ Reference</div>
+      <div class="hint">Double tap to see my drawing ✏️</div>
+
+      <div class="song">
+        <audio id="song" controls>
+          <source src="song.mp3" type="audio/mpeg">
+          Your browser does not support audio.
+        </audio>
+      </div>
+
+      <div class="buttons">
+        <button id="likeBtn">❤️ Like <span id="likeCount">0</span></button>
+        <button id="shareBtn">📤 Share</button>
+        <button id="downloadBtn">⬇️ Download</button>
+      </div>
+
+      <div class="comments">
+        <h2>💬 Leave a comment</h2>
+        <textarea id="comment" placeholder="Write your comment..."></textarea>
+        <br><br>
+        <button id="commentBtn">Submit Comment</button>
+        <div class="comment-note">
+          Set your email in the JavaScript section before publishing.
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <footer>
+    Made with ❤️ for My Funny Things
+  </footer>
+
+  <script>
+    /*
+      Put these files in the SAME GitHub folder as index.html:
+        1. reference.jpg  = reference/Pinterest image
+        2. drawing.jpg    = YOUR drawing
+        3. song.mp3       = your song/audio
+
+      IMPORTANT:
+      Change COMMENT_EMAIL below to your email address.
+    */
+
+    const COMMENT_EMAIL = "YOUR_EMAIL@example.com";
+
+    const referenceImage = "reference.jpg";
+    const drawingImage = "drawing.jpg";
+
+    const image = document.getElementById("artImage");
+    const imageWrap = document.getElementById("imageWrap");
+    const imageLabel = document.getElementById("imageLabel");
+    const likeBtn = document.getElementById("likeBtn");
+    const likeCount = document.getElementById("likeCount");
+    const shareBtn = document.getElementById("shareBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const commentBtn = document.getElementById("commentBtn");
+    const commentBox = document.getElementById("comment");
+
+    let showingDrawing = false;
+    let lastTap = 0;
+
+    function switchImage() {
+      image.classList.add("drawing-effect");
+
+      setTimeout(() => {
+        showingDrawing = !showingDrawing;
+
+        image.src = showingDrawing ? drawingImage : referenceImage;
+        image.alt = showingDrawing ? "My drawing" : "Reference image";
+        imageLabel.textContent = showingDrawing ? "✏️ My Drawing" : "🖼️ Reference";
+
+        setTimeout(() => {
+          image.classList.remove("drawing-effect");
+        }, 80);
+      }, 250);
+    }
+
+    // Double click for desktop
+    imageWrap.addEventListener("dblclick", switchImage);
+
+    // Double tap for phones
+    imageWrap.addEventListener("touchend", function () {
+      const now = Date.now();
+      if (now - lastTap < 350) {
+        switchImage();
+      }
+      lastTap = now;
+    });
+
+    // Like
+    likeBtn.addEventListener("click", () => {
+      const liked = likeBtn.classList.toggle("liked");
+
+      if (liked) {
+        likeCount.textContent = "1";
+        showHeart();
+      } else {
+        likeCount.textContent = "0";
+      }
+    });
+
+    function showHeart() {
+      const heart = document.createElement("div");
+      heart.className = "floating-heart";
+      heart.textContent = "❤️";
+      heart.style.left = (window.innerWidth / 2 - 15) + "px";
+      heart.style.top = (window.innerHeight - 170) + "px";
+      document.body.appendChild(heart);
+
+      setTimeout(() => heart.remove(), 1000);
+    }
+
+    // Share
+    shareBtn.addEventListener("click", async () => {
+      const shareData = {
+        title: "My Funny Things",
+        text: "Check out my drawing on My Funny Things!",
+        url: window.location.href
+      };
+
+      try {
+        if (navigator.share) {
+          await navigator.share(shareData);
+        } else {
+          await navigator.clipboard.writeText(window.location.href);
+          alert("Link copied!");
+        }
+      } catch (error) {
+        // User cancelled share; no action needed.
+      }
+    });
+
+    // Download currently displayed image
+    downloadBtn.addEventListener("click", () => {
+      const link = document.createElement("a");
+      link.href = showingDrawing ? drawingImage : referenceImage;
+      link.download = showingDrawing ? "my-drawing.jpg" : "reference.jpg";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    });
+
+    // Comment
+    commentBtn.addEventListener("click", () => {
+      const comment = commentBox.value.trim();
+
+      if (!comment) {
+        alert("Please write a comment first.");
+        return;
+      }
+
+      if (COMMENT_EMAIL === "YOUR_EMAIL@example.com") {
+        alert("First add your email address in the COMMENT_EMAIL line in the code.");
+        return;
+      }
+
+      const subject = encodeURIComponent("New comment - My Funny Things");
+      const body = encodeURIComponent(
+        "New comment on My Funny Things:\\n\\n" + comment
+      );
+
+      window.location.href =
+        "mailto:" + COMMENT_EMAIL +
+        "?subject=" + subject +
+        "&body=" + body;
+    });
+  </script>
+</body>
+</html>
